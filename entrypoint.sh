@@ -52,5 +52,41 @@ fi
 
 printf "$MULLVAD_TOKEN\nm\n" >> /etc/openvpn/mullvad_userpass.txt
 
+# Add users to socks proxy
+
+if [[ -z "$SOCKS_USERS" ]]; then
+  SOCKS_USERS="mullvad,mullvad"
+fi
+
+addgroup socksusers
+
+# Split the string by spaces to process each user
+while IFS=';' read -r user_info; do
+  # Split each user info by comma
+  IFS=',' read -r username password <<< "$user_info"
+
+  # Check if username already exists
+  if id "$username" &>/dev/null; then
+    echo "User '$username' already exists."
+  else
+    # Add the user
+    adduser -D -H "$username"
+    if [[ $? -ne 0 ]]; then
+      echo "Error adding user '$username'."
+      continue # Skip to the next user
+    fi
+
+    # Set the password
+    echo -e "$password\n$password" | passwd "$username" && unset password
+    if [[ $? -ne 0 ]]; then
+      echo "Error setting password for user '$username'."
+    else
+       echo "User '$username' added and password set successfully."
+    fi
+
+    addgroup "$username" socksusers
+  fi
+done <<< "$SOCKS_USERS"
+
 # needed to run parameters CMD
 $@

@@ -13,6 +13,9 @@ You also need to provide these environment variables:
 - `MULLVAD_SERVERS` - comma serated list of servers with ports. You can get this
     list from `.conf` file at
     [Configuration files page](https://mullvad.net/en/account/openvpn-config?platform=linux)
+- `MULLVAD_TOKEN` - mullvad token
+- `SOCKS_USERS` - users to authentiacte on the socks server in format 
+    "user1,password;user2,anotherpassword". Default "mullvad,mullvad"
 
 ```shell
 docker run -it --rm -p 1080:1080 \
@@ -20,7 +23,6 @@ docker run -it --rm -p 1080:1080 \
 -e MULLVAD_SERVERS='<server1>:<port1>,<server2>:<port2>,...' \
 -e MULLVAD_TOKEN='<TOKEN>' mullvad_socks5:latest
 ```
-
 
 ## Developer notes
 
